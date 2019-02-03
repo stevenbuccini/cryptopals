@@ -36,15 +36,36 @@ def single_byte_xor_cipher(input):
             'v': 0.0082903, 'w': 0.0171272, 'x': 0.0013692,
             'y': 0.0145984, 'z': 0.0007836, ' ': 0.1918182}
     input_as_bytes = unhexlify(input)
-    best_score = 0
+    best_score = float('-inf')
     likely_string = None
     likely_key = None
     for char in string.printable:
-        decrypted_str = bytes([byte ^ ord(char) for byte in input_as_bytes]).decode("utf-8")
-        score = sum([LETTER_FREQUENCIES[char.lower()] for char in decrypted_str if char in string.ascii_letters or char == ' ']) / len(decrypted_str)
+        decrypted_str = bytes([byte ^ ord(char) for byte in input_as_bytes]).decode("latin-1")
+        score = sum([LETTER_FREQUENCIES[char.lower()] if char in string.ascii_letters or char == ' ' else -0.25 for char in decrypted_str ]) / len(decrypted_str)
         if score > best_score:
             best_score = score
             likely_string = decrypted_str
             likely_key  = char
-    return (likely_string, likely_key)
-assert(single_byte_xor_cipher('1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736') == ("Cooking MC's like a pound of bacon", 'X'))
+    return (likely_string, likely_key, score)
+#assert(single_byte_xor_cipher('1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736') == ("Cooking MC's like a pound of bacon", 'X', 0.014387947058823528))
+
+
+#####################
+###  Challenge 4  ###
+#####################
+def find_encrypted_string():
+    highest_score = float('-inf')
+    probable_decoded_str = None
+    probable_key = None
+    input_with_highest_score = None
+    with open("4.txt") as f:
+        for line in f:
+            # Need to strip the newline from end of str
+            decoded_str, key, score = single_byte_xor_cipher(line.strip())
+            if score > highest_score:
+                highest_score = score
+                probable_decoded_str = decoded_str
+                probable_key = key
+                input_with_highest_score = line
+
+    return input_with_highest_score
