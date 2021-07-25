@@ -17,6 +17,9 @@ assert convert_hex_to_base64('49276d206b696c6c696e6720796f757220627261696e206c69
 def ascii_to_bytes(text):
     return bytearray.fromhex(text.encode('utf-8').hex)
 
+def bytes_to_ascii(bytes):
+    return bytes.decode('utf-8')
+
 #####################
 ###  Challenge 2  ###
 #####################
@@ -164,7 +167,7 @@ def break_repeating_key_xor():
     
     return ''.join(final_key)
 
-print(break_repeating_key_xor())
+#print(break_repeating_key_xor())
 
 def test_reapeating_key():
     with open('6.txt') as input_file:
@@ -175,4 +178,20 @@ def test_reapeating_key():
 
     print(''.join([chr(b ^ cracked_key_bytes[i % len(cracked_key_bytes)]) for i, b in enumerate(ciphertext)]))
 
-test_reapeating_key()
+#test_reapeating_key()
+
+#####################
+###  Challenge 7  ###
+#####################
+
+from Crypto.Cipher.AES import AESCipher
+KEY = 'YELLOW SUBMARINE'
+with open('7.txt') as input_file:
+    ciphertext = b64decode(input_file.read())
+
+
+def decrypt_bytes_aes_128_in_ecb_mode(bytes, key):
+    cipher = AESCipher(key)
+    return cipher.decrypt(bytes)
+
+print(bytes_to_ascii(decrypt_bytes_aes_128_in_ecb_mode(ciphertext, KEY)))
